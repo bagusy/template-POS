@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DELES — Order Baru</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800;9..144,900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root {
+  --pine: #154734;
+  --pine-700: #1A5C44;
+  --pine-900: #0E3324;
+  --action: #2D8F5B;
+  --action-hover: #258550;
+  --action-soft: #E8F5EC;
+  --mint: #D4EDDD;
+  --ivory: #FAF7EE;
+  --ivory-warm: #F4EFE0;
+  --surface: #FFFFFF;
+  --surface-alt: #F7F4EA;
+  --divider: #E8E4D8;
+  --divider-strong: #D6D1C0;
+  --text: #154734;
+  --text-secondary: #4A5A4E;
+  --text-muted: #8B978E;
+  --destructive: #C8392B;
+  --destructive-soft: #FCEBE8;
+  --warning: #C68A1B;
+  --warning-soft: #FBF1DC;
+}
+
+* { font-family: 'Plus Jakarta Sans', sans-serif; }
+.font-display { font-family: 'Fraunces', serif; }
+
+body {
+  background: var(--ivory);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.bg-atmosphere {
+  position: fixed; inset: 0; z-index: -2;
+  background:
+    radial-gradient(ellipse at 15% 0%, rgba(21, 71, 52, 0.06), transparent 50%),
+    radial-gradient(ellipse at 85% 100%, rgba(45, 143, 91, 0.05), transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(212, 237, 221, 0.15), transparent 70%),
+    linear-gradient(180deg, #FAF7EE 0%, #F4EFE0 100%);
+}
+.bg-noise {
+  position: fixed; inset: 0; z-index: -1; opacity: 0.4; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+}
+
+.leaf {
+  position: fixed; top: -30px;
+  pointer-events: none; z-index: -1;
+  animation: leafFall linear infinite;
+}
+@keyframes leafFall {
+  0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0; }
+  10% { opacity: 0.5; }
+  90% { opacity: 0.4; }
+  100% { transform: translateY(110vh) translateX(120px) rotate(720deg); opacity: 0; }
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--divider);
+  border-radius: 20px;
+  box-shadow: 0 1px 2px rgba(21, 71, 52, 0.04), 0 8px 24px -12px rgba(21, 71, 52, 0.08);
+}
+
+/* Kartu produk dibuat lebih tinggi (360px) */
+.product-card {
+  background: var(--surface);
+  border: 1px solid var(--divider);
+  border-radius: 16px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 360px; /* Diperpanjang lagi ke bawah */
+}
+.product-card::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(45, 143, 91, 0.08), transparent 50%);
+  opacity: 0; transition: opacity 0.3s; pointer-events: none;
+  z-index: 1;
+}
+.product-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--mint);
+  box-shadow: 0 1px 2px rgba(21, 71, 52, 0.04), 0 16px 40px -16px rgba(21, 71, 52, 0.18);
+}
+.product-card:hover::before { opacity: 1; }
+.product-card:hover .cup-svg { transform: scale(1.06) rotate(-3deg); }
+.cup-svg { transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+.cup-steam path {
+  animation: cupSteam 2.5s ease-in-out infinite;
+  opacity: 0.4;
+}
+.cup-steam path:nth-child(2) { animation-delay: 0.5s; }
+.cup-steam path:nth-child(3) { animation-delay: 1s; }
+@keyframes cupSteam {
+  0%, 100% { opacity: 0.2; transform: translateY(0); }
+  50% { opacity: 0.6; transform: translateY(-3px); }
+}
+
+.btn-add {
+  background: var(--action);
+  color: white;
+  transition: all 0.2s;
+}
+.btn-add:hover {
+  background: var(--action-hover);
+  transform: scale(1.1) rotate(90deg);
+  box-shadow: 0 8px 20px -8px rgba(45, 143, 91, 0.5);
+}
+.btn-add:active { transform: scale(0.95); }
+
+.cart-item {
+  background: var(--surface-alt);
+  border: 1px solid var(--divider);
+  border-radius: 14px;
+  animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.25s;
+}
+.cart-item:hover {
+  background: var(--action-soft);
+  border-color: var(--mint);
+}
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.qty-btn {
+  width: 26px; height: 26px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 7px;
+  background: var(--surface);
+  color: var(--pine);
+  transition: all 0.2s;
+  border: 1px solid var(--divider);
+}
+.qty-btn:hover {
+  background: var(--action);
+  color: white;
+  border-color: var(--action);
+  transform: scale(1.1);
+}
+
+.order-type-btn {
+  flex: 1; padding: 14px 8px;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--divider);
+  color: var(--text-secondary);
+  transition: all 0.25s;
+  cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+}
+.order-type-btn.active {
+  background: var(--action-soft);
+  border-color: var(--action);
+  color: var(--pine);
+}
+.order-type-btn:hover:not(.active) {
+  border-color: var(--mint);
+  background: var(--surface-alt);
+}
+
+.btn-pay {
+  background: var(--action);
+  color: white;
+  font-weight: 700;
+  transition: all 0.3s;
+  position: relative; overflow: hidden;
+}
+.btn-pay.active { animation: pulseGlow 2.5s ease-in-out infinite; }
+.btn-pay.active:hover {
+  transform: translateY(-2px);
+  background: var(--action-hover);
+  box-shadow: 0 20px 40px -10px rgba(45, 143, 91, 0.5);
+}
+.btn-pay:disabled {
+  background: var(--divider);
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+.btn-pay::after {
+  content: ''; position: absolute; top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  transition: left 0.6s;
+}
+.btn-pay.active:hover::after { left: 100%; }
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 10px 30px -10px rgba(45, 143, 91, 0.4); }
+  50% { box-shadow: 0 10px 40px -8px rgba(45, 143, 91, 0.75); }
+}
+
+.total-value { font-variant-numeric: tabular-nums; transition: color 0.3s; }
+
+.toast {
+  position: fixed; bottom: 32px; right: 32px;
+  background: var(--pine);
+  color: white;
+  border-radius: 14px;
+  padding: 14px 20px;
+  display: flex; align-items: center; gap: 12px;
+  z-index: 100;
+  transform: translateX(120%); opacity: 0;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  min-width: 260px;
+  box-shadow: 0 20px 50px -12px rgba(21, 71, 52, 0.4);
+}
+.toast.show { transform: translateX(0); opacity: 1; }
+.toast .toast-icon { background: var(--action); color: white; }
+.toast.warning .toast-icon { background: var(--warning); }
+.toast.destructive .toast-icon { background: var(--destructive); }
+.toast.destructive { background: var(--destructive); }
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--divider-strong); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+.badge {
+  background: var(--warning-soft);
+  color: var(--warning);
+  font-size: 10px; font-weight: 700;
+  padding: 3px 8px; border-radius: 20px;
+  text-transform: uppercase; letter-spacing: 0.5px;
+  border: 1px solid rgba(198, 138, 27, 0.2);
+  position: absolute; top: 8px; left: 8px; z-index: 10;
+}
+.badge.cold {
+  background: #E6F0FA;
+  color: #1F5E8C;
+  border-color: rgba(31, 94, 140, 0.2);
+}
+
+.live-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--action);
+  box-shadow: 0 0 10px var(--action);
+  animation: livePulse 1.5s ease-in-out infinite;
+}
+@keyframes livePulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.8); }
+}
+
+.cat-pill {
+  padding: 8px 16px; border-radius: 100px;
+  font-size: 13px; font-weight: 500;
+  background: var(--surface);
+  border: 1px solid var(--divider);
+  color: var(--text-secondary);
+  cursor: pointer; transition: all 0.25s;
+  white-space: nowrap;
+}
+.cat-pill.active {
+  background: var(--action-soft);
+  color: var(--pine);
+  border-color: var(--mint);
+  font-weight: 600;
+}
+.cat-pill:hover:not(.active) {
+  border-color: var(--mint);
+  color: var(--pine);
+  background: var(--surface-alt);
+}
+
+#cartBadge { transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
+kbd { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 11px; }
+
+.brand-mark { background: var(--pine); color: var(--ivory); }
+.brand-mark .leaf-icon { color: var(--mint); }
+
+.btn-clear { color: var(--text-muted); transition: all 0.2s; }
+.btn-clear:hover:not(:disabled) {
+  color: var(--destructive);
+  background: var(--destructive-soft);
+}
+.btn-clear:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.field {
+  background: var(--surface-alt);
+  border: 1px solid var(--divider);
+  border-radius: 12px;
+  transition: all 0.2s;
+  color: var(--text);
+}
+.field:focus {
+  outline: none;
+  border-color: var(--action);
+  background: var(--surface);
+  box-shadow: 0 0 0 4px var(--action-soft);
+}
+.field::placeholder { color: var(--text-muted); }
+
+@media (max-width: 1100px) {
+  .main-grid { grid-template-columns: 1fr !important; }
+  .main-grid > section { min-height: auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="bg-atmosphere"></div>
+<div class="bg-noise"></div>
+<div id="leafContainer"></div>
+
+<!-- Header -->
+<header class="px-8 py-4 border-b border-[var(--divider)] bg-[var(--ivory)]/80 backdrop-blur-md sticky top-0 z-30">
+  <div class="flex items-center justify-between gap-6">
+    <div class="flex items-center gap-3">
+      <div class="brand-mark w-11 h-11 rounded-2xl flex items-center justify-center shadow-md shadow-[var(--pine)]/20">
+        <svg viewBox="0 0 24 24" class="w-6 h-6 leaf-icon" fill="currentColor">
+          <path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75C7 8 17 8 17 8z"/>
+        </svg>
+      </div>
+      <div>
+        <h1 class="font-display font-black text-xl leading-none tracking-tight text-[var(--pine)]">DELES</h1>
+        <p class="text-xs text-[var(--text-muted)] mt-1">Point of Sale · Kasir</p>
+      </div>
+    </div>
+    
+    <div class="hidden md:flex items-center gap-6 text-sm">
+      <div class="flex items-center gap-2 text-[var(--text-secondary)]">
+        <span class="live-dot"></span><span>Shift aktif</span>
+      </div>
+      <div class="text-[var(--text-secondary)]">
+        <i class="far fa-clock mr-2 text-[var(--text-muted)]"></i><span id="clock">--:--</span>
+      </div>
+      <div class="flex items-center gap-2 text-[var(--text-secondary)]">
+        <span class="w-7 h-7 rounded-full bg-[var(--action-soft)] flex items-center justify-center text-[var(--pine)] text-xs font-bold">R</span>
+        <span>Kasir: Rina</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Page Title -->
+<div class="px-8 pt-8 pb-4">
+  <div class="flex items-end justify-between flex-wrap gap-4">
+    <div>
+      <p class="text-[var(--action)] text-xs font-bold tracking-[0.2em] uppercase mb-2">Pesanan #2024-0142</p>
+      <h2 class="font-display font-black text-5xl leading-none text-[var(--pine)]">Order Baru</h2>
+    </div>
+  </div>
+</div>
+
+<!-- Main Grid -->
+<main class="main-grid px-8 pb-8 grid gap-6" style="grid-template-columns: 1.4fr 1fr 0.95fr;">
+
+  <!-- KATALOG -->
+  <section class="card p-6 flex flex-col">
+    <div class="flex items-center justify-between mb-5 gap-4">
+      <div>
+        <h3 class="font-display font-bold text-2xl text-[var(--pine)]">Katalog</h3>
+        <p class="text-xs text-[var(--text-muted)] mt-1">Pilih produk untuk ditambahkan ke keranjang</p>
+      </div>
+      <div class="relative">
+        <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-xs text-[var(--text-muted)]"></i>
+        <input id="searchInput" type="text" placeholder="Cari menu..." class="field pl-9 pr-4 py-2.5 text-sm w-52">
+      </div>
+    </div>
+    
+    <div class="flex gap-2 mb-5 overflow-x-auto pb-2">
+      <button class="cat-pill active" data-cat="all">Semua</button>
+      <button class="cat-pill" data-cat="Teh Hijau">Teh Hijau</button>
+      <button class="cat-pill" data-cat="Teh Hitam">Teh Hitam</button>
+      <button class="cat-pill" data-cat="Herbal">Herbal</button>
+      <button class="cat-pill" data-cat="Signature">Signature</button>
+      <button class="cat-pill" data-cat="Dingin">Dingin</button>
+    </div>
+    
+    <!-- Batas bawah diperluas (tinggi area ditambah) -->
+    <div id="productGrid" class="grid grid-cols-2 gap-4 max-h-[calc(100vh-230px)] overflow-y-auto pr-2"></div>
+  </section>
+
+  <!-- KERANJANG -->
+  <section class="card p-6 flex flex-col">
+    <div class="flex items-center justify-between mb-5">
+      <div class="flex items-center gap-3">
+        <h3 class="font-display font-bold text-2xl text-[var(--pine)]">Keranjang</h3>
+        <span id="cartBadge" class="px-2.5 py-1 rounded-full bg-[var(--pine)] text-[var(--ivory)] text-xs font-bold min-w-[24px] text-center">0</span>
+      </div>
+      <button id="clearCart" class="btn-clear text-xs px-3 py-1.5 rounded-lg" disabled>
+        <i class="fas fa-trash mr-1"></i>Kosongkan
+      </button>
+    </div>
+    
+    <div id="cartContainer" class="flex-1 overflow-y-auto pr-2 min-h-[300px]"></div>
+  </section>
+
+  <!-- RINGKASAN -->
+  <section class="card p-6 flex flex-col">
+    <h3 class="font-display font-bold text-2xl text-[var(--pine)] mb-5">Ringkasan</h3>
+    
+    <div class="mb-5">
+      <p class="text-xs text-[var(--text-muted)] mb-3 uppercase tracking-wider font-semibold">Tipe Pesanan</p>
+      <div class="flex gap-2">
+        <button class="order-type-btn active" data-type="dinein">
+          <i class="fas fa-utensils text-base"></i>
+          <span class="text-xs font-medium">Makan di Tempat</span>
+        </button>
+        <button class="order-type-btn" data-type="takeaway">
+          <i class="fas fa-bag-shopping text-base"></i>
+          <span class="text-xs font-medium">Bawa Pulang</span>
+        </button>
+      </div>
+    </div>
+    
+    <div class="mb-4">
+      <p class="text-xs text-[var(--text-muted)] mb-2 uppercase tracking-wider font-semibold">Nama Pelanggan <span class="opacity-50 normal-case">(opsional)</span></p>
+      <input type="text" placeholder="Tamu Walk-in" class="field w-full px-4 py-2.5 text-sm">
+    </div>
+    
+    <div class="mb-5">
+      <p class="text-xs text-[var(--text-muted)] mb-2 uppercase tracking-wider font-semibold">Catatan</p>
+      <textarea placeholder="Misal: kurang gula, tanpa es..." rows="2" class="field w-full px-4 py-2.5 text-sm resize-none"></textarea>
+    </div>
+    
+    <div class="border-t border-[var(--divider)] pt-4 mb-4 mt-auto">
+      <div class="flex justify-between text-sm mb-2.5">
+        <span class="text-[var(--text-secondary)]">Subtotal</span>
+        <span id="subtotal" class="font-semibold total-value text-[var(--text)]">Rp0</span>
+      </div>
+      <div class="flex justify-between text-sm mb-2.5">
+        <span class="text-[var(--text-secondary)]">PPN 11%</span>
+        <span id="tax" class="font-semibold total-value text-[var(--text)]">Rp0</span>
+      </div>
+      <div class="flex justify-between items-baseline mt-3 pt-3 border-t border-[var(--divider)]">
+        <span class="font-display text-lg text-[var(--pine)]">Total</span>
+        <span id="total" class="font-display font-black text-3xl text-[var(--action)] total-value">Rp0</span>
+      </div>
+    </div>
+    
+    <button id="payBtn" class="btn-pay w-full py-4 rounded-xl text-base" disabled>
+      <i class="fas fa-wallet mr-2"></i><span id="payBtnText">Bayar</span>
+    </button>
+    
+    <p class="text-xs text-center text-[var(--text-muted)] mt-3">Tekan <kbd class="px-1.5 py-0.5 rounded bg-[var(--surface-alt)] text-[var(--text-secondary)] border border-[var(--divider)]">F2</kbd> untuk checkout</p>
+  </section>
+</main>
+
+<!-- Toast -->
+<div id="toast" class="toast">
+  <div class="toast-icon w-9 h-9 rounded-full flex items-center justify-center shrink-0">
+    <i class="fas fa-check text-sm"></i>
+  </div>
+  <div>
+    <p class="text-sm font-medium" id="toastTitle">Ditambahkan</p>
+    <p class="text-xs opacity-80" id="toastMsg">Item dimasukkan ke keranjang</p>
+  </div>
+</div>
+
+<script>
+// Data produk
+const products = [
+  { id: 1, name: 'Premium Teh Melati', desc: 'Bunga melati segar', price: 12000, color: '#2D8F5B', accent: '#5DBF8A', cat: 'Signature', tag: 'Signature' },
+  { id: 2, name: 'Green Tea', desc: 'Daun teh pilihan', price: 8000, color: '#4A8C5C', accent: '#7AB58A', cat: 'Teh Hijau' },
+  { id: 3, name: 'Teh Tarik', desc: 'Susu karamel', price: 10000, color: '#A8743C', accent: '#C89658', cat: 'Teh Hitam' },
+  { id: 4, name: 'Es Lemon Tea', desc: 'Segar dingin', price: 9000, color: '#C68A1B', accent: '#E0A838', cat: 'Dingin', tag: 'Dingin' },
+  { id: 5, name: 'Matcha Latte', desc: 'Matcha premium Uji', price: 15000, color: '#5A7C3C', accent: '#88A860', cat: 'Signature', tag: 'Signature' },
+  { id: 6, name: 'Teh Oolong', desc: 'Aroma earthy', price: 11000, color: '#8A5C3C', accent: '#A87854', cat: 'Teh Hitam' },
+  { id: 7, name: 'Rose Tea', desc: 'Wangi mawar', price: 13000, color: '#C8392B', accent: '#D85A4A', cat: 'Herbal' },
+  { id: 8, name: 'Earl Grey', desc: 'Bergamot citrus', price: 12000, color: '#3A4A4C', accent: '#5C7072', cat: 'Teh Hitam' },
+  { id: 9, name: 'Teh Pandan', desc: 'Wangi pandan alami', price: 8000, color: '#4A8C5C', accent: '#7AB58A', cat: 'Teh Hijau' },
+  { id: 10, name: 'Es Teh Manis', desc: 'Klasik nusantara', price: 5000, color: '#C68A1B', accent: '#E0A838', cat: 'Dingin', tag: 'Dingin' },
+  { id: 11, name: 'Chamomile Tea', desc: 'Relaksasi sempurna', price: 14000, color: '#E0A838', accent: '#F4D890', cat: 'Herbal' },
+  { id: 12, name: 'Teh Bunga Teratai', desc: 'Eksotis & menenangkan', price: 13000, color: '#C8392B', accent: '#D85A4A', cat: 'Signature', tag: 'Signature' }
+];
+
+let cart = [];
+let orderType = 'dinein';
+let activeCat = 'all';
+let searchTerm = '';
+const PPN_RATE = 0.11;
+
+const fmt = (n) => 'Rp' + n.toLocaleString('id-ID');
+
+// SVG cangkir dengan warna dinamis
+function cupSVG(color, accent, id) {
+  const safeId = id.toString().replace(/[^a-z0-9]/gi, '');
+  return `
+    <svg viewBox="0 0 100 100" class="cup-svg w-full h-full">
+      <ellipse cx="50" cy="92" rx="30" ry="3" fill="rgba(21, 71, 52, 0.12)"/>
+      <g class="cup-steam" stroke="#154734" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.5">
+        <path d="M 38 20 Q 35 14 38 8 Q 41 2 38 -4"/>
+        <path d="M 50 18 Q 47 12 50 6 Q 53 0 50 -6"/>
+        <path d="M 62 20 Q 59 14 62 8 Q 65 2 62 -4"/>
+      </g>
+      <path d="M 25 35 L 30 78 Q 30 84 50 84 Q 70 84 70 78 L 75 35 Z" fill="url(#cupGrad${safeId})" stroke="rgba(21, 71, 52, 0.15)" stroke-width="1"/>
+      <ellipse cx="50" cy="36" rx="24" ry="4" fill="${color}" opacity="0.95"/>
+      <ellipse cx="50" cy="35" rx="20" ry="2.5" fill="${accent}" opacity="0.8"/>
+      <path d="M 75 45 Q 88 45 88 58 Q 88 70 75 70" fill="none" stroke="${color}" stroke-width="3" opacity="0.7" stroke-linecap="round"/>
+      <ellipse cx="38" cy="55" rx="2" ry="14" fill="rgba(255,255,255,0.2)"/>
+      <defs>
+        <linearGradient id="cupGrad${safeId}" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="${accent}" stop-opacity="0.4"/>
+          <stop offset="100%" stop-color="${color}" stop-opacity="0.6"/>
+        </linearGradient>
+      </defs>
+    </svg>
+  `;
+}
+
+function renderProducts() {
+  const grid = document.getElementById('productGrid');
+  const filtered = products.filter(p => {
+    const matchCat = activeCat === 'all' || p.cat === activeCat;
+    const matchSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()) || p.desc.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchCat && matchSearch;
+  });
+  
+  if (filtered.length === 0) {
+    grid.innerHTML = `<div class="col-span-2 text-center py-12 text-[var(--text-muted)]">
+      <i class="fas fa-mug-saucer text-3xl mb-3 opacity-30"></i>
+      <p class="text-sm">Tidak ada produk ditemukan</p>
+    </div>`;
+    return;
+  }
+  
+  grid.innerHTML = filtered.map(p => `
+    <article class="product-card p-4" data-id="${p.id}">
+      <div class="aspect-square mb-3 relative shrink-0">
+        ${p.tag ? `<span class="badge ${p.tag === 'Dingin' ? 'cold' : ''}">${p.tag}</span>` : ''}
+        ${cupSVG(p.color, p.accent, p.id)}
+      </div>
+      <div class="flex flex-col flex-1">
+        <h4 class="font-display font-bold text-base leading-tight text-[var(--pine)]">${p.name}</h4>
+        <p class="text-xs text-[var(--text-muted)] mt-0.5">${p.desc}</p>
+        <div class="flex items-end justify-between gap-2 mt-auto pt-3">
+          <p class="font-bold text-[var(--action)] text-lg font-display">${fmt(p.price)}</p>
+          <button class="btn-add w-10 h-10 rounded-xl flex items-center justify-center shrink-0" data-id="${p.id}" aria-label="Tambah ${p.name}">
+            <i class="fas fa-plus text-sm"></i>
+          </button>
+        </div>
+      </div>
+    </article>
+  `).join('');
+  
+  document.querySelectorAll('.product-card').forEach(card => {
+    card.addEventListener('mousemove', e => {
+      const rect = card.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 100;
+      const y = ((e.clientY - rect.top) / rect.height) * 100;
+      card.style.setProperty('--mx', x + '%');
+      card.style.setProperty('--my', y + '%');
+    });
+  });
+  
+  document.querySelectorAll('.btn-add').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      addToCart(parseInt(btn.dataset.id));
+    });
+  });
+}
+
+function addToCart(id) {
+  const product = products.find(p => p.id === id);
+  const existing = cart.find(item => item.id === id);
+  if (existing) {
+    existing.qty += 1;
+  } else {
+    cart.push({ ...product, qty: 1 });
+  }
+  renderCart();
+  showToast(product.name, 'Ditambahkan ke keranjang', 'success');
+  
+  const badge = document.getElementById('cartBadge');
+  badge.style.transform = 'scale(1.4)';
+  setTimeout(() => badge.style.transform = 'scale(1)', 220);
+}
+
+function updateQty(id, delta) {
+  const item = cart.find(item => item.id === id);
+  if (!item) return;
+  item.qty += delta;
+  if (item.qty <= 0) {
+    cart = cart.filter(i => i.id !== id);
+  }
+  renderCart();
+}
+
+function renderCart() {
+  const container = document.getElementById('cartContainer');
+  const badge = document.getElementById('cartBadge');
+  const clearBtn = document.getElementById('clearCart');
+  
+  const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
+  badge.textContent = totalQty;
+  
+  if (cart.length === 0) {
+    clearBtn.disabled = true;
+    container.innerHTML = `
+      <div class="h-full flex flex-col items-center justify-center text-center py-16">
+        <div class="mb-4">
+          <svg viewBox="0 0 120 100" class="w-28 h-24">
+            <ellipse cx="60" cy="92" rx="38" ry="4" fill="rgba(21, 71, 52, 0.06)"/>
+            <path d="M 30 35 L 35 80 Q 35 86 60 86 Q 85 86 85 80 L 90 35 Z" fill="none" stroke="#D6D1C0" stroke-width="2"/>
+            <path d="M 90 45 Q 102 45 102 56 Q 102 67 90 67" fill="none" stroke="#D6D1C0" stroke-width="2"/>
+            <path d="M 42 25 Q 39 18 43 12" stroke="#2D8F5B" stroke-width="1.5" fill="none" stroke-linecap="round">
+              <animate attributeName="opacity" values="0.3;0.7;0.3" dur="2s" repeatCount="indefinite"/>
+            </path>
+            <path d="M 58 22 Q 55 15 59 9" stroke="#2D8F5B" stroke-width="1.5" fill="none" stroke-linecap="round">
+              <animate attributeName="opacity" values="0.3;0.7;0.3" dur="2.5s" repeatCount="indefinite" begin="0.5s"/>
+            </path>
+            <path d="M 74 25 Q 71 18 75 12" stroke="#2D8F5B" stroke-width="1.5" fill="none" stroke-linecap="round">
+              <animate attributeName="opacity" values="0.3;0.7;0.3" dur="2.2s" repeatCount="indefinite" begin="1s"/>
+            </path>
+          </svg>
+        </div>
+        <p class="font-display text-lg text-[var(--pine)] mb-1">Keranjang masih kosong</p>
+        <p class="text-xs text-[var(--text-muted)] max-w-[220px]">Pilih produk dari katalog untuk mulai mencatat pesanan</p>
+      </div>
+    `;
+  } else {
+    clearBtn.disabled = false;
+    container.innerHTML = cart.map(item => `
+      <div class="cart-item p-3 mb-2 flex items-center gap-3">
+        <div class="w-12 h-12 rounded-xl shrink-0 flex items-center justify-center" style="background: linear-gradient(135deg, ${item.accent}33, ${item.color}22);">
+          <svg viewBox="0 0 100 100" class="w-8 h-8">
+            <path d="M 25 35 L 30 78 Q 30 84 50 84 Q 70 84 70 78 L 75 35 Z" fill="${item.color}" opacity="0.85"/>
+            <ellipse cx="50" cy="36" rx="24" ry="4" fill="${item.accent}" opacity="0.8"/>
+            <path d="M 75 45 Q 85 45 85 55 Q 85 65 75 65" fill="none" stroke="${item.color}" stroke-width="3" opacity="0.6"/>
+          </svg>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="font-medium text-sm truncate text-[var(--pine)]">${item.name}</p>
+          <p class="text-xs text-[var(--text-muted)]">${fmt(item.price)} <span class="opacity-60">× ${item.qty}</span></p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button class="qty-btn" onclick="updateQty(${item.id}, -1)" aria-label="Kurangi ${item.name}">
+            <i class="fas fa-minus text-[10px]"></i>
+          </button>
+          <span class="font-bold text-sm w-6 text-center font-display text-[var(--pine)]">${item.qty}</span>
+          <button class="qty-btn" onclick="updateQty(${item.id}, 1)" aria-label="Tambah ${item.name}">
+            <i class="fas fa-plus text-[10px]"></i>
+          </button>
+        </div>
+      </div>
+    `).join('');
+  }
+  
+  updateSummary();
+}
+
+const currentValues = { subtotal: 0, tax: 0, total: 0 };
+
+function animateValue(id, target) {
+  const el = document.getElementById(id);
+  const start = currentValues[id] || 0;
+  const duration = 450;
+  const startTime = performance.now();
+  
+  function tick(now) {
+    const progress = Math.min((now - startTime) / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const value = Math.round(start + (target - start) * eased);
+    el.textContent = fmt(value);
+    if (progress < 1) requestAnimationFrame(tick);
+    else currentValues[id] = target;
+  }
+  requestAnimationFrame(tick);
+}
+
+function updateSummary() {
+  const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+  const tax = Math.round(subtotal * PPN_RATE);
+  const total = subtotal + tax;
+  
+  animateValue('subtotal', subtotal);
+  animateValue('tax', tax);
+  animateValue('total', total);
+  
+  const payBtn = document.getElementById('payBtn');
+  const payBtnText = document.getElementById('payBtnText');
+  if (cart.length > 0) {
+    payBtn.disabled = false;
+    payBtn.classList.add('active');
+    payBtnText.textContent = `Bayar ${fmt(total)}`;
+  } else {
+    payBtn.disabled = true;
+    payBtn.classList.remove('active');
+    payBtnText.textContent = 'Bayar';
+  }
+}
+
+let toastTimer;
+function showToast(title, msg, type = 'success') {
+  const toast = document.getElementById('toast');
+  document.getElementById('toastTitle').textContent = title;
+  document.getElementById('toastMsg').textContent = msg;
+  
+  toast.classList.remove('warning', 'destructive');
+  const icon = toast.querySelector('.toast-icon i');
+  if (type === 'warning') {
+    toast.classList.add('warning');
+    icon.className = 'fas fa-exclamation text-sm';
+  } else if (type === 'destructive') {
+    toast.classList.add('destructive');
+    icon.className = 'fas fa-trash text-sm';
+  } else {
+    icon.className = 'fas fa-check text-sm';
+  }
+  
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
+document.querySelectorAll('.order-type-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.order-type-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    orderType = btn.dataset.type;
+  });
+});
+
+document.getElementById('clearCart').addEventListener('click', () => {
+  if (cart.length === 0) return;
+  cart = [];
+  renderCart();
+  showToast('Keranjang dikosongkan', 'Semua item telah dihapus', 'destructive');
+});
+
+document.getElementById('payBtn').addEventListener('click', () => {
+  if (cart.length === 0) return;
+  const total = cart.reduce((s, i) => s + i.price * i.qty, 0) * (1 + PPN_RATE);
+  showToast('Pembayaran diproses', 'Total ' + fmt(Math.round(total)), 'success');
+  setTimeout(() => {
+    cart = [];
+    renderCart();
+  }, 1800);
+});
+
+document.querySelectorAll('.cat-pill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+    activeCat = pill.dataset.cat;
+    renderProducts();
+  });
+});
+
+document.getElementById('searchInput').addEventListener('input', (e) => {
+  searchTerm = e.target.value;
+  renderProducts();
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'F2') {
+    e.preventDefault();
+    document.getElementById('payBtn').click();
+  }
+});
+
+function updateClock() {
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2, '0');
+  const m = String(now.getMinutes()).padStart(2, '0');
+  document.getElementById('clock').textContent = `${h}:${m}`;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// Generator partikel daun teh
+function createLeaf() {
+  const leaf = document.createElement('div');
+  leaf.className = 'leaf';
+  const size = 10 + Math.random() * 14;
+  const colors = ['#154734', '#2D8F5B', '#4A8C5C', '#5DBF8A'];
+  const color = colors[Math.floor(Math.random() * colors.length)];
+  leaf.style.left = Math.random() * 100 + 'vw';
+  leaf.style.width = size + 'px';
+  leaf.style.height = size + 'px';
+  leaf.style.animationDuration = (10 + Math.random() * 8) + 's';
+  leaf.style.animationDelay = Math.random() * 2 + 's';
+  leaf.innerHTML = `<svg viewBox="0 0 24 24" fill="${color}" style="opacity:0.15;"><path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75C7 8 17 8 17 8z"/></svg>`;
+  document.getElementById('leafContainer').appendChild(leaf);
+  setTimeout(() => leaf.remove(), 20000);
+}
+setInterval(createLeaf, 900);
+for (let i = 0; i < 5; i++) setTimeout(createLeaf, i * 400);
+
+renderProducts();
+renderCart();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Antrian Order — Deles POS</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,800;0,9..144,900&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* 1. Skema Warna Dasar (Diperbarui sesuai tabel) */
+    --pine: #284D45; /* Header / Dark Green */
+    --action: #467166; /* Tombol utama Muted Sage Green */
+    --action-text: #163F37; /* Teks tombol Deep Green */
+    --action-hover: #3A5E54; /* Hover state untuk tombol */
+    
+    --ivory: #F8F7F1; /* Background card cream & body */
+    --surface: #FFFFFF;
+    --surface-alt: #F8F7F1; /* Background card cream */
+    --mint-light: #E3F3E9; /* Background card mint */
+    
+    --fg: #16473D; /* Teks utama Deep Green */
+    --text-secondary: #829993; /* Teks sekunder Muted Sage */
+    --text-muted: #829993; /* Teks sekunder Muted Sage */
+    
+    --pill-bg: #88A89E; /* Pill / Time badge Sage Green */
+    
+    --status-diproses-bg: #E6F1EB; /* Status DIPROSES Pale Mint */
+    --status-diproses-text: #16473D; /* Deep Green text */
+    
+    --warning-bg: #F3E9D2; /* Status MENUNGGU BAYAR Soft Champagne */
+    --warning-text: #7A5C2E; /* Dark brown for contrast on champagne */
+    
+    --cold-bg: #E4EEF7; /* Status DIBAYAR Pale Blue */
+    --cold-text: #385C75; /* Dark blue for contrast on pale blue */
+    
+    --divider: #DDE6E1; /* Border/divider Very Light Sage */
+    
+    --destructive: #C8392B;
+    --destructive-hover-bg: #FCEBE8;
+    
+    /* Variable Mapping untuk Template */
+    --bg-ivory: var(--ivory);
+    --bg-mint: var(--mint-light);
+    --border: var(--divider);
+    --action-light: var(--action);
+    --forest-deep: #284D45; /* Menyelaraskan forest-deep ke warna header baru */
+    --warn-amber: var(--warning-text);
+    --urgent-red: var(--destructive);
+    
+    --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  
+  * { font-family: 'Plus Jakarta Sans', sans-serif; }
+  .font-display { font-family: 'Fraunces', serif; letter-spacing: -0.01em; }
+  .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+  /* Latar Belakang Body */
+  body {
+    background-color: var(--ivory);
+    color: var(--fg);
+    min-height: 100vh;
+  }
+
+  /* 8. Scrollbar Kustom */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background-color: #C0CBC4; border-radius: 100px; }
+  ::-webkit-scrollbar-thumb:hover { background-color: #A8B5AE; }
+
+  /* === KUSTOM STYLE SYSTEM === */
+  .total-value {
+    font-variant-numeric: tabular-nums;
+    font-family: 'Fraunces', serif;
+    font-weight: 800;
+  }
+  
+  .badge {
+    font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em;
+  }
+
+  kbd {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    border: 1px solid var(--divider);
+    background: var(--surface);
+    box-shadow: 0 2px 0 var(--divider);
+    border-radius: 6px;
+    padding: 2px 6px;
+    color: var(--fg);
+    font-weight: 600;
+  }
+
+  /* 5. Latar Header & Brand */
+  header.border-b {
+    background-color: rgba(248, 247, 241, 0.8) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+  }
+  .header-logo-mark {
+    background: var(--pine) !important;
+    background-image: none !important;
+  }
+  .user-avatar {
+    background: var(--mint-light) !important;
+    background-image: none !important;
+    color: var(--pine) !important;
+  }
+
+  /* === FILTER PILLS === */
+  .filter-pill {
+    padding: 0.5rem 1rem;
+    border-radius: 100px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: all 0.3s var(--ease-smooth);
+    background: var(--surface);
+    border: 1px solid var(--divider);
+    color: var(--text-secondary);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+  }
+  .filter-pill:hover, .filter-pill.active {
+    border-color: var(--action);
+    color: var(--fg);
+    background: var(--mint-light);
+  }
+  .filter-pill .filter-count {
+    background: rgba(0,0,0,0.05);
+    padding: 0.1rem 0.4rem;
+    border-radius: 100px;
+    font-size: 0.65rem;
+    font-weight: 700;
+  }
+  .filter-pill.active .filter-count {
+    background: rgba(22, 71, 61, 0.1);
+    color: var(--fg);
+  }
+
+  .live-dot {
+    width: 7px; height: 7px; border-radius: 50%; background: var(--action);
+    box-shadow: 0 0 0 0 rgba(70,113,102,0.6);
+    animation: live-pulse 2s infinite;
+  }
+  @keyframes live-pulse {
+    0% { box-shadow: 0 0 0 0 rgba(70,113,102,0.5); }
+    70% { box-shadow: 0 0 0 8px rgba(70,113,102,0); }
+    100% { box-shadow: 0 0 0 0 rgba(70,113,102,0); }
+  }
+
+  .ticker-in { animation: ticker-in 0.45s var(--ease-smooth) backwards; }
+  @keyframes ticker-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* === PANEL LAYOUT === */
+  .section-panel {
+    background: var(--surface);
+    border: 1px solid var(--divider);
+    border-radius: 20px;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    box-shadow: 0 8px 24px -12px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s var(--ease-smooth);
+  }
+  .panel-instore, .panel-pickup {
+    background: var(--surface);
+  }
+
+  .panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0.75rem 0.5rem 0.5rem;
+    background: var(--surface-alt);
+    border: 1px solid var(--divider);
+    border-radius: 16px;
+  }
+
+  /* === ORDER CARDS === */
+  .order-card {
+    transition: transform 0.3s var(--ease-smooth), box-shadow 0.3s var(--ease-smooth), opacity 0.3s;
+    position: relative;
+    overflow: hidden;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--divider);
+    box-shadow: 0 8px 24px -12px rgba(0, 0, 0, 0.08);
+    height: 100%;
+    background: var(--surface);
+  }
+  .order-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 25px -8px rgba(40, 77, 69, 0.2);
+    border-color: var(--mint-light);
+  }
+  .order-card.hidden { display: none; }
+
+  .card-content {
+    position: relative;
+    overflow: hidden;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 1.25rem;
+    z-index: 2;
+  }
+  .card-content::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(circle at 100% 0%, rgba(255,255,255,0.4) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .card-header {
+    padding: 0.75rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    z-index: 2;
+  }
+  .card-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .context-info {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-top: 0.1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  /* Card Latar Berdasarkan Tipe (Header #284D45, BG Cream/Mint) */
+  .card-takeaway .card-header, .card-dinein .card-header, 
+  .card-pickup .card-header, .card-delivery .card-header { 
+    background: var(--pine); color: #F5F4EE; /* Soft White untuk teks header */ 
+  }
+  /* Takeaway & Dine-in menggunakan Background Card Cream */
+  .card-takeaway .card-content, .card-dinein .card-content { 
+    background: var(--surface-alt); color: var(--fg); 
+    --divider-color: var(--divider); 
+  }
+  /* Pickup & Delivery menggunakan Background Card Mint */
+  .card-pickup .card-content, .card-delivery .card-content { 
+    background: var(--mint-light); color: var(--fg); 
+    --divider-color: var(--divider); 
+  }
+
+  /* Override inline styles untuk kartu Pickup & Delivery agar teksnya gelap */
+  .card-pickup .context-info, .card-delivery .context-info,
+  .card-pickup .product-note, .card-delivery .product-note {
+    color: var(--text-secondary) !important;
+  }
+  .card-pickup div[class*="text-white"], .card-delivery div[class*="text-white"] {
+    color: var(--text-secondary) !important;
+    opacity: 1 !important;
+  }
+  .card-pickup .total-value, .card-delivery .total-value {
+    color: var(--fg) !important; /* Teks utama Deep Green */
+  }
+  .card-pickup [class*="border-white"], .card-delivery [class*="border-white"] {
+    border-color: var(--divider) !important;
+  }
+
+  /* 6. Latar Notifikasi & Badge (Diperbarui sesuai tabel) */
+  .status-pill {
+    padding: 0.25rem 0.75rem;
+    border-radius: 100px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    box-shadow: none;
+    background: var(--surface);
+    color: var(--fg);
+    border: 1px solid var(--divider);
+  }
+  .status-pill.primary { /* DIPROSES */
+    background: var(--status-diproses-bg); 
+    color: var(--status-diproses-text); 
+    border: none; 
+  }
+  .status-pill.warning { /* MENUNGGU BAYAR */
+    background: var(--warning-bg); 
+    color: var(--warning-text); 
+    border: none; 
+  }
+  .status-pill.info { /* DIBAYAR */
+    background: var(--cold-bg); 
+    color: var(--cold-text); 
+    border: none; 
+  }
+  .status-pill.tertiary { background: var(--mint-light); color: var(--fg); border: none; }
+  .status-pill.purple { background: #E6E0F8; color: #4527A0; border: none; }
+  .status-pill.success { background: var(--mint-light); color: var(--action); border: none; }
+
+  /* Urgency Chips / Time Badge */
+  .urgency-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 100px;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    white-space: nowrap;
+  }
+  /* Normal : Pill / Time badge Sage Green #88A89E */
+  .urgency-chip[data-level="normal"] { background: var(--pill-bg); color: #FFFFFF; }
+  .urgency-chip[data-level="warning"] { background: var(--warning-bg); color: var(--warning-text); }
+  .urgency-chip[data-level="urgent"] { background: var(--destructive-hover-bg); color: var(--destructive); animation: urgent-pulse 2.5s infinite; }
+  .urgency-chip[data-level="done"] { background: var(--divider); color: var(--text-secondary); }
+  @keyframes urgent-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.65; } }
+
+  /* Override Urgency Chips di Pickup & Delivery agar konsisten menyatu di bg mint */
+  .card-pickup .urgency-chip[data-level="normal"],
+  .card-delivery .urgency-chip[data-level="normal"] { background: var(--pill-bg); color: #FFFFFF; }
+  .card-pickup .urgency-chip[data-level="warning"],
+  .card-delivery .urgency-chip[data-level="warning"] { background: var(--warning-bg); color: var(--warning-text); }
+  .card-pickup .urgency-chip[data-level="urgent"],
+  .card-delivery .urgency-chip[data-level="urgent"] { background: var(--destructive-hover-bg); color: var(--destructive); }
+  .card-pickup .urgency-chip[data-level="done"],
+  .card-delivery .urgency-chip[data-level="done"] { background: var(--divider); color: var(--text-secondary); }
+
+  .urgency-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+
+  /* 3. Latar Interaktif (Tombol) - Diperbarui ke Muted Sage Green #467166 */
+  .action-btn {
+    width: 100%;
+    padding: 0.65rem 0.75rem;
+    border-radius: 16px;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    transition: all 0.3s var(--ease-smooth);
+    cursor: pointer;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .action-btn:focus-visible { outline: 2px solid var(--action); outline-offset: 2px; }
+
+  .card-takeaway .action-btn, .card-dinein .action-btn,
+  .card-pickup .action-btn, .card-delivery .action-btn { 
+    background: var(--action); color: var(--action-text); /* Teks tombol Deep Green */ 
+  }
+  .card-takeaway .action-btn:hover, .card-dinein .action-btn:hover,
+  .card-pickup .action-btn:hover, .card-delivery .action-btn:hover { 
+    background: var(--action-hover); transform: translateY(-2px); box-shadow: 0 0 20px rgba(70, 113, 102, 0.3); 
+  }
+
+  /* Shimmer Effect */
+  .action-btn:not(.action-done)::after {
+    content: "";
+    position: absolute;
+    top: 0; left: -100%;
+    width: 50%; height: 100%;
+    background: linear-gradient(to right, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.6s var(--ease-smooth);
+  }
+  .action-btn:hover::after { left: 150%; }
+
+  /* Divider Background untuk Disabled */
+  .action-btn.action-done { background: var(--divider) !important; color: var(--text-secondary) !important; cursor: default; box-shadow: none; }
+  .card-pickup .action-btn.action-done, .card-delivery .action-btn.action-done { 
+    background: var(--divider) !important; color: var(--text-secondary) !important; 
+  }
+
+  .product-list { display: flex; flex-direction: column; gap: 0; margin-top: 0.25rem; margin-bottom: 0.75rem; }
+  .product-group { padding: 0.5rem 0; position: relative; z-index: 2; }
+  .product-group:not(:last-child) { border-bottom: 1px dashed var(--divider-color); }
+  .product-item { display: flex; align-items: center; gap: 0.5rem; }
+  
+  .product-qty { 
+    font-family: 'Fraunces', serif; 
+    font-size: 1rem; font-weight: 700; opacity: 0.8; min-width: 25px; color: inherit;
+  }
+  .product-name { 
+    font-size: 1rem; font-weight: 700; line-height: 1.25; display: block;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%;
+  }
+  .product-note { 
+    margin-left: 35px; margin-top: 0.25rem; font-size: 0.75rem; font-weight: 500; 
+    color: var(--text-secondary); display: flex; align-items: center; gap: 0.25rem; 
+  }
+
+  @keyframes status-flash {
+    0% { box-shadow: 0 0 0 3px var(--action), 0 12px 25px -8px rgba(0, 0, 0, 0.2); }
+    100% { box-shadow: 0 8px 24px -12px rgba(0, 0, 0, 0.08); }
+  }
+  .card-flash { animation: status-flash 0.7s var(--ease-smooth) forwards; }
+</style>
+</head>
+<body>
+
+<div class="min-h-screen">
+
+  <!-- ============ HEADER ============ -->
+  <header class="border-b border-[var(--border)] bg-[var(--bg-ivory)]/80 backdrop-blur-xl sticky top-0 z-30">
+    <div class="px-6 py-3 flex items-center justify-between gap-6 flex-wrap">
+      <div class="flex items-center gap-3">
+        <div class="header-logo-mark w-9 h-9 rounded-xl bg-gradient-to-br from-[var(--action)] to-[var(--forest-deep)] flex items-center justify-center shadow-md shadow-[#46716630]">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/>
+            <line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/>
+          </svg>
+        </div>
+        <div>
+          <div class="font-display text-xl font-black leading-none tracking-tight text-[var(--pine)]">DELES</div>
+          <div class="text-[9px] text-[var(--text-muted)] tracking-[0.2em] uppercase mt-1">Point of Sale</div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4 text-sm">
+        <div class="flex items-center gap-2">
+          <span class="live-dot"></span>
+          <span class="text-[var(--action)] font-semibold text-xs">Buka</span>
+          <span class="text-[var(--text-muted)] text-xs">·</span>
+          <span class="font-medium text-xs text-[var(--fg)]">Kamis, 17 September 2026</span>
+        </div>
+        <div class="h-4 w-px bg-[var(--divider)]"></div>
+        <div class="font-mono font-medium text-xs text-[var(--pine)] total-value" id="clock">14:32:08</div>
+        <div class="h-4 w-px bg-[var(--divider)] hidden md:block"></div>
+        <div class="hidden md:flex items-center gap-2 text-[var(--text-muted)] text-xs">
+          Tekan <kbd>F2</kbd> untuk Order Baru
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2 pl-3 border-l border-[var(--divider)]">
+          <div class="user-avatar w-8 h-8 rounded-full bg-gradient-to-br from-[var(--action-light)] to-[var(--action)] flex items-center justify-center text-white text-[10px] font-bold">AS</div>
+          <div class="hidden sm:block">
+            <div class="text-xs font-semibold leading-none text-[var(--fg)]">Angga S.</div>
+            <div class="text-[9px] text-[var(--text-muted)] mt-1">Kasir · Shift 2</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ MAIN ============ -->
+  <main class="px-6 py-6">
+
+    <!-- Filter & Stats Section -->
+    <div class="mb-8">
+      <!-- Filter Pills (Horizontal Scroll) -->
+      <div class="flex items-center gap-2 overflow-x-auto pb-3 -mx-6 px-6 mb-4">
+        <button class="filter-pill active" data-filter="all">
+          Semua <span class="filter-count">9</span>
+        </button>
+        <button class="filter-pill" data-filter="menunggu_bayar">
+          Menunggu Pembayaran <span class="filter-count">2</span>
+        </button>
+        <button class="filter-pill" data-filter="dibayar">
+          Dibayar <span class="filter-count">1</span>
+        </button>
+        <button class="filter-pill" data-filter="diproses">
+          Diproses <span class="filter-count">2</span>
+        </button>
+        <button class="filter-pill" data-filter="siap">
+          Siap <span class="filter-count">1</span>
+        </button>
+        <button class="filter-pill" data-filter="dikirim">
+          Dikirim <span class="filter-count">1</span>
+        </button>
+        <button class="filter-pill" data-filter="selesai">
+          Selesai <span class="filter-count">2</span>
+        </button>
+        <button class="filter-pill" data-filter="dibatalkan">
+          Dibatalkan <span class="filter-count">0</span>
+        </button>
+      </div>
+      
+      <!-- Stats Summary -->
+      <div class="flex flex-wrap items-center gap-8">
+        <div class="flex items-center gap-3">
+          <span class="font-display text-4xl font-black leading-none text-[var(--fg)] total-value" id="stat-total">9</span>
+          <div class="text-[10px] text-[var(--text-muted)] uppercase tracking-wider leading-tight font-semibold">Order<br>hari ini</div>
+        </div>
+        <div class="h-8 w-px bg-[var(--divider)]"></div>
+        <div class="flex items-center gap-3">
+          <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+          <span class="font-display text-4xl font-black leading-none text-[var(--fg)] total-value" id="stat-menunggu">3</span>
+          <div class="text-[10px] text-[var(--text-muted)] uppercase tracking-wider leading-tight font-semibold">Menunggu<br>Pembayaran</div>
+        </div>
+        <div class="h-8 w-px bg-[var(--divider)]"></div>
+        <div class="flex items-center gap-3">
+          <span class="w-2.5 h-2.5 rounded-full bg-cyan-500"></span>
+          <span class="font-display text-4xl font-black leading-none text-[var(--fg)] total-value" id="stat-siap">2</span>
+          <div class="text-[10px] text-[var(--text-muted)] uppercase tracking-wider leading-tight font-semibold">Siap<br>Dikirim</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2 Panels Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-7xl mx-auto">
+
+      <!-- ===== PANEL 1: DALAM TOKO ===== -->
+      <section data-section="instore" class="section-panel panel-instore">
+        <div class="panel-header">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-lg bg-[var(--forest-deep)] flex items-center justify-center text-white shadow-md">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 2v7c0 1.1.9 2 2 2h0a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/>
+              </svg>
+            </div>
+            <div>
+              <h2 class="font-display text-xl font-bold text-[var(--pine)] leading-none">DALAM TOKO</h2>
+              <p class="text-[10px] text-[var(--text-secondary)] mt-1 tracking-wide uppercase font-medium">Dine-in & Bawa Pulang</p>
+            </div>
+          </div>
+          <span class="font-mono text-[11px] text-[var(--action)] bg-[var(--action)]/10 px-3 py-1.5 rounded-full border border-[var(--action)]/20 section-counter font-bold">3 ORDER</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <!-- Card 1: Bawa Pulang -->
+          <article class="order-card card-takeaway ticker-in" data-status="diproses" data-minutes="8">
+            <div class="card-header">
+              <div class="card-header-row">
+                <h3 class="font-display text-xs font-bold tracking-[0.2em] uppercase">BAWA PULANG</h3>
+                <span class="status-pill primary"></span>
+              </div>
+              <div class="font-mono text-[11px] text-[var(--action)] tracking-wider">#DLS-3147-260917-012</div>
+              <div class="context-info">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>
+                Rian Kurniawan
+              </div>
+            </div>
+            <div class="card-content">
+              <div class="product-list">
+                <div class="product-group">
+                  <div class="product-item">
+                    <span class="product-qty">1×</span>
+                    <span class="product-name">Green Tea</span>
+                  </div>
+                  <div class="product-note">+ Less sugar</div>
+                </div>
+              </div>
+              <div class="mt-auto">
+                <button class="action-btn" data-action="advance"></button>
+                <div class="flex items-end justify-between mt-3 pt-3 border-t border-black/10 relative z-10">
+                  <span class="urgency-chip"><span class="urgency-dot"></span></span>
+                  <div class="text-right">
+                    <div class="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-secondary)]">Total</div>
+                    <div class="font-mono text-lg font-black leading-none total-value text-[var(--fg)]">Rp8.000</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- Card 2: Dine-in -->
+          <article class="order-card card-dinein ticker-in" data-status="menunggu_bayar" data-minutes="12" style="animation-delay: 0.1s;">
+            <div class="card-header">
+              <div class="card-header-row">
+                <h3 class="font-display text-xs font-bold tracking-[0.2em] uppercase">DINE-IN</h3>
+                <span class="status-pill warning"></span>
+              </div>
+              <div class="font-mono text-[11px] text-[var(--action)] tracking-wider">#DLS-3147-260917-009</div>
+              <div class="context-info">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h0a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>
+                Meja 04 · 2 org
+              </div>
+            </div>
+            <div class="card-content">
+              <div class="product-list">
+                <div class="product-group">
+                  <div class="product-item">
+                    <span class="product-qty">1×</span>
+                    <span class="product-name">Teh Tarik Premium</span>
+                  </div>
+                  <div class="product-note">Less sugar, no ice</div>
+                </div>
+                <div class="product-group">
+                  <div class="product-item">
+                    <span class="product-qty">1×</span>
+                    <span class="product-name">Teh Tarik Premium</span>
+                  </div>
+                  <div class="product-note">Extra shot</div>
+                </div>
+              </div>
+              <div class="mt-auto">
+                <button class="action-btn" data-action="advance"></button>
+                <div class="flex items-end justify-between mt-3 pt-3 border-t border-black/10 relative z-10">
+                  <span class="urgency-chip"><span class="urgency-dot"></span></span>
+                  <div class="text-right">
+                    <div class="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-secondary)]">Total</div>
+                    <div class="font-mono text-lg font-black leading-none total-value text-[var(--fg)]">Rp24.000</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- Card 3: Bawa Pulang (Full Width) -->
+          <article class="order-card card-takeaway ticker-in sm:col-span-2" data-status="selesai" data-minutes="45" style="animation-delay: 0.2s;">
+            <div class="card-header">
+              <div class="card-header-row">
+                <h3 class="font-display text-xs font-bold tracking-[0.2em] uppercase">BAWA PULANG</h3>
+                <span class="status-pill success"></span>
+              </div>
+              <div class="font-mono text-[11px] text-[var(--action)] tracking-wider">#DLS-3147-260917-004</div>
+              <div class="context-info">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>
+                Budi Santoso
+              </div>
+            </div>
+            <div class="card-content">
+              <div class="product-list">
+                <div class="product-group">
+                  <div class="product-item">
+                    <span class="product-qty">1×</span>
+                    <span class="product-name">Kopi Susu</span>
+                  </div>
+                  <div class="product-note">Extra shot, oat milk</div>
+                </div>
+                <div class="product-group">
+                  <div class="product-item">
+                    <span class="product-qty">2×</span>
+                    <span class="product-name">Croissant Almond</span>
+                  </div>
+                  <div class="product-note">Hangat</div>
+                </div>
+              </div>
+              <div class="mt-auto">
+                <button class="action-btn action-done" disabled></button>
+                <div class="flex items-end justify-between mt-3 pt-3 border-t border-black/10 relative z-10">
+                  <span class="urgency-chip"><span class="urgency-dot"></span></span>
+                  <div class="text-right">
+                    <div class="text-[10px] uppercase tracking-wider font-semibold text-[var(--text-secondary)]">Total</div>
+                    <div class="font-mono text-lg font-black leading-none total-value text-[var(--fg)]">Rp45.000</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- ===== PANEL 2: PICK UP & DELIVERY ===== -->
+      <section data-section="pickup" class="section-panel panel-pickup">
+        <div class="panel-header">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-lg bg-[var(--pine)] flex items-center justify-center text-white shadow-md">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+                <path d="m3.27 6.96 8.73 5.05 8.73-5.05"/><path d="M12 22.08V12"/>
+              </svg>
+            </div>
+            <div>
+              <h2 class="font-display text-xl font-bold text-[var(--pine)] leading-none">PICK UP & DELIVERY</h2>
+              <p class="text-[10px] text-[var(--text-secondary)] mt-1 tracking-wide uppercase font-medium">Ambil Sendiri & Antar</p>
+            </div>
+          </div>
+          <span class="font-mono text-[11px] text-[var(--pine)] bg-[var(--pine)]/10 px-3 py-1.5 rounded-full border border-[var(--pine)]/20 section-counter font-bold">6 ORDER</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <!-- Card 4: Ambil Sendiri -->
+          <article class="order-card card-pickup ticker-in" data-status="diproses" data-minutes="6">
+            <div class="card-header">
+              <div class="card-header-row">
+                <h3 class="font-display text-xs font-bold tracking-[0.2em] uppercase">AMBIL SENDIRI</h3>
+                <span class="status-pill primary"></span>
+              </div>
+              <div class="font-mono text-[11px] text-[var(--ivory)] opacity-80 tracking-wider">#DLS-3147-260917-011</div>
+              <div class="context-info" style="color: rgba(255,255,255,0.7);">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>
+                Sari Wulandari · Pickup 14:40
+              </div>
+            </div>
+            <div class="card-content">
+              <div class="product-list">
+                <div class="product-group">
+                  <div class="product-item">
+                    <span class="product-qty">1×</span>
+                    <span class="product-name">Premium Teh Melati</span>
+                  </div>
+                  <div class="product-note" style="color: rgba(255,255,255,0.7);">Less ice</div>
+                </div>
+              </div>
+              <div class="mt-auto">
+                <button class="action-btn" data-action="advance"></button>
+                <div class="flex items-end justify-between mt-3 pt-3 border-t border-white/20 relative z-10">
+                  <span class="urgency-chip"><span class="urgency-dot"></span></span>
+                  <div class="text-right">
+                    <div class="text-[10px] uppercase tracking-wider font-semibold text-white opacity-80">Total</div>
+                    <div class="font-mono text-lg font-black leading-none total-value text-white">Rp12.000</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- Card 5: Antar -->
+          <article class="order-card card-delivery ticker-in" data-status="dibayar" data-minutes="14" style="animation-delay: 0.1s;">
+            <div class="card-header">
+              <div class="card-header-row">
+                <h3 class="font-display text-xs font-bold tracking-[0.2em] uppercase">ANTAR</h3>
+                <span class="status-pill info"></span>
+              </div>
+              <div class="font-mono text-[11px] text-[var(--ivory)] opacity-80 tracking-wider">#DLS-3147-260917-010</div>
+              <div class="context-info" style="color: rgba(255,255,255,0.7);">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                GoFood · Andi Pratama
+              </div>
+            </div>
+            <div class="card-content">
+              <div class="product-list">
+                <div class="product-group">
+                  <div class="product-item">
+                    <span class="product-qty">1×</span>
+                    <span class="product-name">Premium Teh Melati</span>
+                  </div>
+                  <div class="product-note" style="color: rgba(255,255,255,0.7);">No sugar</div>
+                </div>
+              </div>
+              <div class="mt-auto">
+                <button class="action-btn" data-action="advance"></button>
+                <div class="flex items-end justify-between mt-3 pt-3 border-t border-white/20 relative z-10">
+                  <span class="urgency-chip"><span class="urgency-dot"></span></span>
+                  <div class="text-right">
+                    <div class="text-[10px] uppercase tracking-wider font-semibold text-white opacity-80">Total</div>
+                    <div class="font-mono text-lg font-black leading-none total-value text-white">Rp20.000</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- Card 6: Ambil Sendiri -->
+          <article class="order-card card-pickup ticker-in" data-status="menunggu_bayar" data-minutes="18" style="animation-delay: 0.2s;">
+            <div class="card-header">
+              <div class="card-header-row">
+                <h3 class="font-display text-xs font-bold tracking-[0.2em] uppercase">AMBIL SENDIRI</h3>
+                <span class="status-pill warning"></span>
+              </div>
+              <div class="font-mono text-[11px] text-[var(--ivory)] opacity-80 tracking-wider">#DLS-3147-260917-006</div>
+              <div class="context-info" style="color: rgba(255,255,255,0.7);">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>
+                Dewi Anggraini · Pickup 14:30
+              </div>
+            </div>
+            <div class="card-content">
+              <div class="product-list">
+                <div class="product-group">
+                  <div class="product-item">
+                    <span class="product-qty">1×</span>
+                    <span class="product-name">Roti Bakar</span>
+                  </div>
+                  <div class="product-note" style="color: rgba(255,255,255,0.7);">Extra cheese</div>
+                </div>
+                <div class="product-group">
+                  <div class="product-item">
+                    <span class="product-qty">1×</span>
+                    <span class="product-name">Es Teh Manis</span>
+                  </div>
+                  <div class="product-note" style="color: rgba(255,255,255,0.7);">Less ice</div>
+                </div>
+              </div>
+              <div class="mt-auto">
+                <button class="action-btn" data-action="advance"></button>
+                <div class="flex items-end justify-between mt-3 pt-3 border-t border-white/20 relative z-10">
+                  <span class="urgency-chip"><span class="urgency-dot"></span></span>
+                  <div class="text-right">
+                    <div class="text-[10px] uppercase tracking-wider font-semibold text-white opacity-80">Total</div>
+                    <div class="font-mono text-lg font-black leading-none total-value text-white">Rp20.000</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- Card 7: Antar -->
+          <article class="order-card card-delivery ticker-in" data-status="selesai" data-minutes="35" style="animation-delay: 0.3s;">
+            <div class="card-header">
+              <div class="card-header-row">
+                <h3 class="font-display text-xs font-bold tracking-[0.2em] uppercase">ANTAR</h3>
+                <span class="status-pill success"></span>
+              </div>
+              <div class="font-mono text-[11px] text-[var(--ivory)] opacity-80 tracking-wider">#DLS-3147-260917-005</div>
+              <div class="context-info" style="color: rgba(255,255,255,0.7);">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                GrabFood · Maya Rahma
+              </div>
+            </div>
+            <div class="card-content">
+              <div class="product-list">
+                <div class="product-group">
+                  <div class="product-item">
+                    <span class="product-qty">1×</span>
+                    <span class="product-name">Cappuccino</span>
+                  </div>
+                  <div class="product-note" style="color: rgba(255,255,255,0.7);">Oat milk</div>
+                </div>
+              </div>
+              <div class="mt-auto">
+                <button class="action-btn action-done" disabled></button>
+                <div class="flex items-end justify-between mt-3 pt-3 border-t border-white/20 relative z-10">
+                  <span class="urgency-chip"><span class="urgency-dot"></span></span>
+                  <div class="text-right">
+                    <div class="text-[10px] uppercase tracking-wider font-semibold text-white opacity-80">Total</div>
+                    <div class="font-mono text-lg font-black leading-none total-value text-white">Rp22.000</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- Card 8: Ambil Sendiri -->
+          <article class="order-card card-pickup ticker-in" data-status="siap" data-minutes="25" style="animation-delay: 0.4s;">
+            <div class="card-header">
+              <div class="card-header-row">
+                <h3 class="font-display text-xs font-bold tracking-[0.2em] uppercase">AMBIL SENDIRI</h3>
+                <span class="status-pill tertiary"></span>
+              </div>
+              <div class="font-mono text-[11px] text-[var(--ivory)] opacity-80 tracking-wider">#DLS-3147-260917-003</div>
+              <div class="context-info" style="color: rgba(255,255,255,0.7);">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>
+                Joko Susilo · Pickup 15:00
+              </div>
+            </div>
+            <div class="card-content">
+              <div class="product-list">
+                <div class="product-group">
+                  <div class="product-item">
+                    <span class="product-qty">1×</span>
+                    <span class="product-name">Matcha Latte</span>
+                  </div>
+                  <div class="product-note" style="color: rgba(255,255,255,0.7);">Less ice, extra shot</div>
+                </div>
+              </div>
+              <div class="mt-auto">
+                <button class="action-btn" data-action="advance"></button>
+                <div class="flex items-end justify-between mt-3 pt-3 border-t border-white/20 relative z-10">
+                  <span class="urgency-chip"><span class="urgency-dot"></span></span>
+                  <div class="text-right">
+                    <div class="text-[10px] uppercase tracking-wider font-semibold text-white opacity-80">Total</div>
+                    <div class="font-mono text-lg font-black leading-none total-value text-white">Rp25.000</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- Card 9: Antar (Consolidated) -->
+          <article class="order-card card-delivery ticker-in" data-status="dikirim" data-minutes="40" style="animation-delay: 0.5s;">
+            <div class="card-header">
+              <div class="card-header-row">
+                <h3 class="font-display text-xs font-bold tracking-[0.2em] uppercase">ANTAR</h3>
+                <span class="status-pill purple"></span>
+              </div>
+              <div class="font-mono text-[11px] text-[var(--ivory)] opacity-80 tracking-wider">#DLS-3147-260917-002</div>
+              <div class="context-info" style="color: rgba(255,255,255,0.7);">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                GoFood · Lina Marlina
+              </div>
+            </div>
+            <div class="card-content">
+              <div class="product-list">
+                <div class="product-group">
+                  <div class="product-item">
+                    <span class="product-qty">2×</span>
+                    <span class="product-name">Green Tea</span>
+                  </div>
+                  <div class="product-note" style="color: rgba(255,255,255,0.7);">1 reg · 1 extra honey</div>
+                </div>
+              </div>
+              <div class="mt-auto">
+                <button class="action-btn" data-action="advance"></button>
+                <div class="flex items-end justify-between mt-3 pt-3 border-t border-white/20 relative z-10">
+                  <span class="urgency-chip"><span class="urgency-dot"></span></span>
+                  <div class="text-right">
+                    <div class="text-[10px] uppercase tracking-wider font-semibold text-white opacity-80">Total</div>
+                    <div class="font-mono text-lg font-black leading-none total-value text-white">Rp16.000</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+    </div>
+
+  </main>
+
+</div>
+
+<script>
+  /* ============ CLOCK ============ */
+  function updateClock() {
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2, '0');
+    const m = String(now.getMinutes()).padStart(2, '0');
+    const s = String(now.getSeconds()).padStart(2, '0');
+    const el = document.getElementById('clock');
+    if (el) el.textContent = `${h}:${m}:${s}`;
+  }
+  updateClock();
+  setInterval(updateClock, 1000);
+
+  /* ============ STATE MANAGEMENT ============ */
+  const statusFlow = {
+    menunggu_bayar: { next: 'dibayar', label: 'Konfirmasi Bayar' },
+    dibayar: { next: 'diproses', label: 'Mulai Proses' },
+    diproses: { next: 'siap', label: 'Tandai Siap' },
+    siap: { next: 'dikirim', label: 'Tandai Dikirim' },
+    dikirim: { next: 'selesai', label: 'Tandai Selesai' },
+    selesai: { next: null, label: 'Selesai' }
+  };
+
+  const statusPillConfig = {
+    menunggu_bayar: { text: 'Menunggu Bayar', class: 'warning' },
+    dibayar: { text: 'Dibayar', class: 'info' },
+    diproses: { text: 'Diproses', class: 'primary' },
+    siap: { text: 'Siap', class: 'tertiary' },
+    dikirim: { text: 'Dikirim', class: 'purple' },
+    selesai: { text: 'Selesai', class: 'success' }
+  };
+
+  function getUrgencyLevel(minutes, status) {
+    if (status === 'selesai') return 'done';
+    if (minutes < 10) return 'normal';
+    if (minutes <= 20) return 'warning';
+    return 'urgent';
+  }
+
+  function formatTime(minutes) {
+    if (minutes < 60) return `${minutes} mnt lalu`;
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return mins > 0 ? `${hours} jam ${mins} mnt lalu` : `${hours} jam lalu`;
+  }
+
+  /* ============ TAB FILTERING ============ */
+  const tabs = document.querySelectorAll('.filter-pill');
+  let activeFilter = 'all';
+
+  function filterCards(filter) {
+    activeFilter = filter;
+    document.querySelectorAll('.order-card').forEach(card => {
+      const status = card.dataset.status;
+      if (filter === 'all' || status === filter) {
+        card.classList.remove('hidden');
+      } else {
+        card.classList.add('hidden');
+      }
+    });
+    updateSectionCounts();
+  }
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      filterCards(tab.dataset.filter);
+    });
+  });
+
+  /* ============ COUNT UPDATES ============ */
+  function updateTabCounts() {
+    const cards = document.querySelectorAll('.order-card');
+    const counts = { 
+      all: cards.length, 
+      menunggu_bayar: 0, 
+      dibayar: 0, 
+      diproses: 0, 
+      siap: 0, 
+      dikirim: 0,
+      selesai: 0, 
+      dibatalkan: 0 
+    };
+    
+    cards.forEach(card => {
+      const status = card.dataset.status;
+      if (counts[status] !== undefined) counts[status]++;
+    });
+
+    document.querySelectorAll('.filter-pill').forEach(pill => {
+      const key = pill.dataset.filter;
+      const countEl = pill.querySelector('.filter-count');
+      if (countEl) countEl.textContent = counts[key] || 0;
+    });
+
+    // Update summary stats
+    document.getElementById('stat-total').textContent = counts.all;
+    document.getElementById('stat-menunggu').textContent = counts.menunggu_bayar + counts.dibayar;
+    document.getElementById('stat-siap').textContent = counts.siap + counts.dikirim;
+  }
+
+  function updateSectionCounts() {
+    document.querySelectorAll('.section-panel').forEach(section => {
+      const visibleCards = section.querySelectorAll('.order-card:not(.hidden)');
+      const counter = section.querySelector('.section-counter');
+      if (counter) {
+        counter.textContent = `${visibleCards.length} ORDER`;
+      }
+    });
+  }
+
+  /* ============ ACTION BUTTON STATE MACHINE ============ */
+  function updateActionButton(btn, status) {
+    const config = statusFlow[status];
+    if (!config) return;
+
+    if (config.next === null) {
+      btn.classList.add('action-done');
+      btn.disabled = true;
+      btn.innerHTML = `
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Selesai
+      `;
+    } else {
+      btn.classList.remove('action-done');
+      btn.disabled = false;
+      let icon = '';
+      if (status === 'menunggu_bayar') {
+        icon = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`;
+      } else if (status === 'dibayar') {
+        icon = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>`;
+      } else if (status === 'diproses') {
+        icon = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>`;
+      } else if (status === 'siap') {
+        icon = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>`;
+      } else if (status === 'dikirim') {
+        icon = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+      }
+      btn.innerHTML = `${icon} ${config.label}`;
+    }
+  }
+
+  function updateUrgencyChip(card, status) {
+    const chip = card.querySelector('.urgency-chip');
+    const minutes = parseInt(card.dataset.minutes);
+    const level = getUrgencyLevel(minutes, status);
+    chip.dataset.level = level;
+    chip.innerHTML = `<span class="urgency-dot"></span>${formatTime(minutes)}`;
+  }
+
+  function updateStatusPill(card, status) {
+    const pill = card.querySelector('.status-pill');
+    const config = statusPillConfig[status];
+    pill.className = 'status-pill';
+    if (config.class) pill.classList.add(config.class);
+    pill.textContent = config.text;
+  }
+
+  function advanceStatus(card) {
+    const currentStatus = card.dataset.status;
+    const config = statusFlow[currentStatus];
+    if (!config || !config.next) return;
+
+    const newStatus = config.next;
+    card.dataset.status = newStatus;
+
+    updateStatusPill(card, newStatus);
+    updateActionButton(card.querySelector('.action-btn'), newStatus);
+    updateUrgencyChip(card, newStatus);
+
+    // Flash animation
+    card.classList.add('card-flash');
+    setTimeout(() => card.classList.remove('card-flash'), 700);
+
+    // Update counts
+    updateTabCounts();
+
+    // Re-apply filter if needed
+    if (activeFilter !== 'all' && newStatus !== activeFilter) {
+      setTimeout(() => {
+        card.classList.add('hidden');
+        updateSectionCounts();
+      }, 600);
+    } else {
+      updateSectionCounts();
+    }
+  }
+
+  // Bind action buttons
+  document.querySelectorAll('.action-btn[data-action="advance"]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const card = btn.closest('.order-card');
+      advanceStatus(card);
+    });
+  });
+
+  /* ============ INIT ============ */
+  // Initialize all cards dynamically based on data-status
+  document.querySelectorAll('.order-card').forEach(card => {
+    const status = card.dataset.status;
+    updateStatusPill(card, status);
+    const btn = card.querySelector('.action-btn');
+    if (btn) updateActionButton(btn, status);
+    updateUrgencyChip(card, status);
+  });
+
+  updateTabCounts();
+  updateSectionCounts();
+</script>
+</body>
+</html>
